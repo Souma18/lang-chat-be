@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: chat-pending-service
+    env: docker
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: SPRING_DATASOURCE_URL
+        sync: false  # Sẽ set thủ công từ PostgreSQL service
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+
+databases:
+  - name: chat-service-db
+    databaseName: chat_service_db
+    user: chat_user
+    plan: free  # Hoặc starter nếu free không có

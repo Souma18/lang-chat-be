@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: chat_service_mysql
+    environment:
+      MYSQL_DATABASE: chat_service_db
+      MYSQL_ROOT_PASSWORD: 01252331055 
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql-init:/docker-entrypoint-initdb.d
+    command: --default-authentication-plugin=mysql_native_password
+
+  chat-pending-service:
+    build: .
+    container_name: chat_pending_service
+    depends_on:
+      - mysql
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/chat_service_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 01252331055
+    ports:    
+      - "8081:8080"
+
+volumes:
+  mysql_data:
+

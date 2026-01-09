@@ -1,0 +1,104 @@
+{
+    "info": {
+      "name": "Pending Chat Service",
+      "_postman_id": "b4cba1e0-0000-0000-0000-pending-chat",
+      "description": "API test pending conversation (Lang-Chat-Be)",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "Create Pending (A -> B)",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"fromUsername\": \"userA\",\n  \"toUsername\": \"userB\"\n}"
+          },
+          "url": {
+            "raw": "http://localhost:8081/api/chat/pending-conversations",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "8081",
+            "path": ["api", "chat", "pending-conversations"]
+          }
+        },
+        "response": []
+      },
+      {
+        "name": "Get Incoming Pending (for B)",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "http://localhost:8081/api/chat/pending-conversations/incoming?username=userB",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "8081",
+            "path": ["api", "chat", "pending-conversations", "incoming"],
+            "query": [
+              {
+                "key": "username",
+                "value": "userB"
+              }
+            ]
+          }
+        },
+        "response": []
+      },
+      {
+        "name": "Accept Pending (B rep A)",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"fromUsername\": \"userA\",\n  \"toUsername\": \"userB\"\n}"
+          },
+          "url": {
+            "raw": "http://localhost:8081/api/chat/pending-conversations/accept",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "8081",
+            "path": ["api", "chat", "pending-conversations", "accept"]
+          }
+        },
+        "response": []
+      },
+      {
+        "name": "Delete Pending (B từ chối A)",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"fromUsername\": \"userA\",\n  \"toUsername\": \"userB\"\n}"
+          },
+          "url": {
+            "raw": "http://localhost:8081/api/chat/pending-conversations/delete",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "8081",
+            "path": ["api", "chat", "pending-conversations", "delete"]
+          }
+        },
+        "response": []
+      }
+    ],
+    "variable": []
+  }
