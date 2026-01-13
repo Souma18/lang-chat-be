@@ -22,55 +22,53 @@ public class PendingConversationService {
 
     @Transactional
     public PendingConversation createOrRefreshPending(CreatePendingRequest request) {
+        String fromUser = request.getFromUsername();
+        String toUser = request.getToUsername();
+
+        if (fromUser.equals(toUser)) {
+            throw new IllegalArgumentException("Cannot send request to yourself");
+        }
+
+        // Check if already friends bidirectional (A->B or B->A with status ACCEPTED)
+        boolean existsForward = pendingConversationRepository.existsByFromUsernameAndToUsernameAndStatus(fromUser, toUser, PendingStatus.ACCEPTED);
+        boolean existsBackward = pendingConversationRepository.existsByFromUsernameAndToUsernameAndStatus(toUser, fromUser, PendingStatus.ACCEPTED);
+
+        if (existsForward || existsBackward) {
+            throw new IllegalStateException("Conversation already exists");
+        }
+
         return pendingConversationRepository
-                .findByFromUsernameAndToUsernameAndStatus(
-                        request.getFromUsername(),
-                        request.getToUsername(),
-                        PendingStatus.PENDING
-                )
-                .map(existing -> {
-                    // chỉ cần touch updatedAt (đã được handle bởi @PreUpdate)
-                    return pendingConversationRepository.save(existing);
-                })
+                .findByFromUsernameAndToUsernameAndStatus(fromUser, toUser, PendingStatus.PENDING)
+                .map(existing -> pendingConversationRepository.save(existing))
                 .orElseGet(() -> {
                     PendingConversation pc = new PendingConversation();
-                    pc.setFromUsername(request.getFromUsername());
-                    pc.setToUsername(request.getToUsername());
+                    pc.setFromUsername(fromUser);
+                    pc.setToUsername(toUser);
                     pc.setStatus(PendingStatus.PENDING);
                     return pendingConversationRepository.save(pc);
                 });
     }
 
     @Transactional(readOnly = true)
-    public List<PendingUserResponse> getPendingForUser(String toUsername) {
-        List<PendingConversation> conversations =
-                pendingConversationRepository.findByToUsernameAndStatus(toUsername, PendingStatus.PENDING);
-
-        return conversations.stream()
-                .map(pc -> new PendingUserResponse(
-                        pc.getFromUsername(),
-                        pc.getStatus().name(),
-                        pc.getCreatedAt()
-                ))
-                .collect(Collectors.toList());
+    public List<PendingConversation> getPendingForUser(String toUsername) {
+        return pendingConversationRepository.findByToUsernameAndStatus(toUsername, PendingStatus.PENDING);
     }
 
     @Transactional
-    public void acceptOrDelete(String fromUsername, String toUsername, boolean delete) {
+    public void acceptRequest(String fromUsername, String toUsername) {
+        PendingConversation pc = pendingConversationRepository
+                .findByFromUsernameAndToUsernameAndStatus(fromUsername, toUsername, PendingStatus.PENDING)
+                .orElseThrow(() -> new IllegalArgumentException("Pending conversation not found"));
+        
+        pc.setStatus(PendingStatus.ACCEPTED);
+        pendingConversationRepository.save(pc);
+    }
+
+    @Transactional
+    public void deleteRequest(String fromUsername, String toUsername) {
         pendingConversationRepository
-                .findByFromUsernameAndToUsernameAndStatus(
-                        fromUsername,
-                        toUsername,
-                        PendingStatus.PENDING
-                )
-                .ifPresent(pc -> {
-                    if (delete) {
-                        pendingConversationRepository.delete(pc);
-                    } else {
-                        pc.setStatus(PendingStatus.ACCEPTED);
-                        pendingConversationRepository.save(pc);
-                    }
-                });
+                .findByFromUsernameAndToUsernameAndStatus(fromUsername, toUsername, PendingStatus.PENDING)
+                .ifPresent(pendingConversationRepository::delete);
     }
 }
 

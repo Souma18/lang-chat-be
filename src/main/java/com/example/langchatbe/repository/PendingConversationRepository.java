@@ -14,5 +14,7 @@ public interface PendingConversationRepository extends JpaRepository<PendingConv
     Optional<PendingConversation> findByFromUsernameAndToUsernameAndStatus(String fromUsername,
                                                                            String toUsername,
                                                                            PendingStatus status);
+
+    boolean existsByFromUsernameAndToUsernameAndStatus(String fromUsername, String toUsername, PendingStatus status);
 }
 

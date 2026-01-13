@@ -98,7 +98,55 @@
           }
         },
         "response": []
+      },
+      {
+        "name": "Get Theme (A & B)",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "http://localhost:8081/api/chat/settings/theme?user1=userA&user2=userB",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "8081",
+            "path": ["api", "chat", "settings", "theme"],
+            "query": [
+              {
+                "key": "user1",
+                "value": "userA"
+              },
+              {
+                "key": "user2",
+                "value": "userB"
+              }
+            ]
+          }
+        },
+        "response": []
+      },
+      {
+        "name": "Set Theme (A set for B)",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"userOne\": \"userA\",\n  \"userTwo\": \"userB\",\n  \"themeId\": \"OCEAN_BLUE\"\n}"
+          },
+          "url": {
+            "raw": "http://localhost:8081/api/chat/settings/theme",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "8081",
+            "path": ["api", "chat", "settings", "theme"]
+          }
+        },
+        "response": []
       }
-    ],
-    "variable": []
-  }
+    ]
+}

@@ -30,21 +30,28 @@ public class PendingConversationController {
 
     @GetMapping("/incoming")
     public ResponseEntity<OnChatResponse<List<PendingUserResponse>>> getIncoming(@RequestParam("username") String username) {
-        List<PendingUserResponse> responses = pendingConversationService.getPendingForUser(username);
+        List<PendingConversation> conversations = pendingConversationService.getPendingForUser(username);
+        List<PendingUserResponse> responses = conversations.stream()
+                .map(pc -> new PendingUserResponse(
+                        pc.getFromUsername(),
+                        pc.getStatus().name(),
+                        pc.getCreatedAt()
+                ))
+                .toList();
         OnChatResponse<List<PendingUserResponse>> body = new OnChatResponse<>("PENDING_INCOMING", responses);
         return ResponseEntity.ok(body);
     }
 
     @PostMapping("/accept")
     public ResponseEntity<OnChatResponse<Object>> accept(@RequestBody UpdatePendingRequest request) {
-        pendingConversationService.acceptOrDelete(request.getFromUsername(), request.getToUsername(), false);
+        pendingConversationService.acceptRequest(request.getFromUsername(), request.getToUsername());
         OnChatResponse<Object> body = new OnChatResponse<>("PENDING_ACCEPT", null);
         return ResponseEntity.ok(body);
     }
 
     @PostMapping("/delete")
     public ResponseEntity<OnChatResponse<Object>> delete(@RequestBody UpdatePendingRequest request) {
-        pendingConversationService.acceptOrDelete(request.getFromUsername(), request.getToUsername(), true);
+        pendingConversationService.deleteRequest(request.getFromUsername(), request.getToUsername());
         OnChatResponse<Object> body = new OnChatResponse<>("PENDING_DELETE", null);
         return ResponseEntity.ok(body);
     }

@@ -25,3 +25,11 @@ CREATE TRIGGER update_pending_conversation_updated_at
     BEFORE UPDATE ON pending_conversation
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TABLE IF NOT EXISTS conversation_settings (
+    id BIGSERIAL PRIMARY KEY,
+    user_one VARCHAR(255) NOT NULL,
+    user_two VARCHAR(255) NOT NULL,
+    theme_id VARCHAR(50) NOT NULL DEFAULT 'DEFAULT',
+    CONSTRAINT uq_conv_setting_pair UNIQUE (user_one, user_two)
+);
