@@ -33,3 +33,12 @@ CREATE TABLE IF NOT EXISTS conversation_settings (
     theme_id VARCHAR(50) NOT NULL DEFAULT 'DEFAULT',
     CONSTRAINT uq_conv_setting_pair UNIQUE (user_one, user_two)
 );
+
+CREATE TABLE IF NOT EXISTS group_conversation_settings (
+    id BIGSERIAL PRIMARY KEY,
+    group_name VARCHAR(255) NOT NULL,
+    theme_id VARCHAR(50) NOT NULL DEFAULT 'DEFAULT',
+    owner VARCHAR(255),
+    last_changed_by VARCHAR(255),
+    CONSTRAINT uq_group_name UNIQUE (group_name)
+);
